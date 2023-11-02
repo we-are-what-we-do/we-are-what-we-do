@@ -10,11 +10,11 @@ const outDir = resolve(__dirname, 'dist');
 export default defineConfig({
   base: "./",
   server: {
-    host: true, // 同じwifi内の他の端末からipアドレスを指定してdev serverにアクセスする
+    // host: true, // 同じwifi内の他の端末からipアドレスを指定してdev serverにアクセスする
   },
   plugins: [
     react(),
-    basicSsl() // HTTPSでdev serverにアクセスする
+    // basicSsl() // HTTPSでdev serverにアクセスする
   ],
   root,
   build: {

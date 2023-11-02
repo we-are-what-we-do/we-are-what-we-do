@@ -19,8 +19,8 @@ export type ImageData = {
 
 /* 関数定義 */
 // export const API_DOMAIN: string = "api.wawwd.net"; // 本番用アプリケーションサーバーのドメイン
-export const API_DOMAIN: string = "testApi.wawwd.net"; // 本番用アプリケーションサーバーのドメイン
-const API_URL: string = `https://${API_DOMAIN}/`; // アプリケーションサーバーのURL
+export const API_DOMAIN: string = "localhost:3854"; // localhostのdockerコンテナのIP
+const API_URL: string = `http://${API_DOMAIN}/`; // アプリケーションサーバーのURL
 
 // GETリクエストを行う共通関数
 async function makeGetRequest(apiEndpoint: string, queryParams?: string): Promise<Response>{
