@@ -22,8 +22,8 @@ const Geolocation: React.FC = () => {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        console.log(`Latitude: ${position.coords.latitude}`);
-        console.log(`Longitude: ${position.coords.longitude}`);
+        // console.log(`Latitude: ${position.coords.latitude}`);
+        // console.log(`Longitude: ${position.coords.longitude}`);
 
         setPosition({
           latitude: position.coords.latitude,

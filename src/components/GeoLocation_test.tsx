@@ -28,8 +28,8 @@ const Geolocation_test: React.FC<GeolocationProps> = ({ setPosition }) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        console.log(`Latitude: ${latitude}`);
-        console.log(`Longitude: ${longitude}`);
+        // console.log(`Latitude: ${latitude}`);
+        // console.log(`Longitude: ${longitude}`);
 
         // 位置情報を親コンポーネントに送る
         setPosition(latitude, longitude);

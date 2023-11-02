@@ -4,13 +4,12 @@ import { DbContext } from "./providers/DbProvider";
 import { CaptureContext } from "./providers/CaptureProvider";
 import { GpsContext } from "./providers/GpsProvider";
 import { OrbitControls } from "@react-three/drei";
-import { Canvas, } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import TorusList from './components/TorusList';
 import Camera from "./components/Camera";
 import { ToastContainer } from 'react-toastify';
 import { Vector3 } from "three";
 import ButtonArea from "./components/ButtonArea";
-import TestButtons from "./components/TestButtons";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CircularProgress } from "@mui/material";
 import { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
@@ -57,10 +56,9 @@ export default function App() {
   
   // GPSの状態を管理するcontext
   const {
-    // gpsFlag
+    gpsFlag,
     isLoadedGps
   } = useContext(GpsContext);
-  const gpsFlag: boolean = true;// TODO どこでもリング表示機能(テスト)を削除する
 
   // 撮影ボタンの処理中かどうか
   const isTakingPhoto = useRef<boolean>(false);
@@ -155,7 +153,6 @@ export default function App() {
         </div>
       </div>
       <ThemeProvider theme={theme}>
-        {true && <TestButtons/>}
         <ButtonArea
           theme={theme}
           isTakingPhoto={isTakingPhoto}
