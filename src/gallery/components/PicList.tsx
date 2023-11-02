@@ -15,7 +15,7 @@ function PicList({updatePhotoCount}: PicListProps) {
     })
   }, [updatePhotoCount]);
 
-  const baseUrl = "https://we-are-what-we-do.s3.ap-northeast-1.amazonaws.com/";
+  const baseUrl = "https://wawwd-galleries.s3.ap-northeast-1.amazonaws.com/";
   return (
     <div className="picListContainer">
       {picPaths.map((picPath, index) => (
