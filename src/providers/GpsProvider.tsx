@@ -144,7 +144,7 @@ export function GpsProvider({children}: {children: ReactNode}){
 
             // ピンの範囲内かどうかをチェックしてメッセージとして表示する
             showTestMessage({
-                isDo: isFirstDone && false, // TODO 本番環境ではチェック用メッセージは表示しない
+                isDo: isFirstDone/*  && false */, // TODO 本番環境ではチェック用メッセージは表示しない
                 feature,
                 distance,
                 radius,
