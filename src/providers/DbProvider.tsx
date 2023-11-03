@@ -52,7 +52,14 @@ export function DbProvider({children}: {children: ReactNode}){
 
     // リングのデータを、サーバーから取得したデータで初期化する関数
     async function initializeRingData(): Promise<void>{
-        const newRingsData: RingData[] = await getRingData() ?? [];
+        // リングデータを取得する
+        let newRingsData: RingData[] = [];
+        try{
+            newRingsData = await getRingData();
+        }catch(error){
+            // リングデータを取得できなかった際のエラーハンドリング
+            showErrorToast("E099"); // 「システムエラー」というメッセージを表示する
+        }
         // リングデータを70個までに限定して切り出す(一応)
         const extractedRingData: RingData[] = getLatestLap(newRingsData);
         const newLatestRing: RingData | null = getLatestRing(newRingsData);
@@ -98,6 +105,7 @@ export function DbProvider({children}: {children: ReactNode}){
 
 /* 仮定義関数 */
 import { positionArray } from '../torusPosition';
+import { showErrorToast } from '../components/ToastHelpers';
 // 配列の最後のn個のリングデータを直接取得する関数
 function getLastRings(data: RingData[], lastAmount: number): RingData[]{
     return data.slice(-lastAmount); // 配列の最後のn個を取得
