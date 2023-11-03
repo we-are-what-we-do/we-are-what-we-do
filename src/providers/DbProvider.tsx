@@ -45,9 +45,7 @@ export function DbProvider({children}: {children: ReactNode}){
 
     // 初回レンダリング時、サーバーからデータを取得する
     useEffect(() => {
-        initializeRingData().then(() => {
-            setIsLoadedData(true);
-        });
+        initializeRingData();
     }, [])
 
     // リングのデータを、サーバーから取得したデータで初期化する関数
@@ -56,6 +54,7 @@ export function DbProvider({children}: {children: ReactNode}){
         let newRingsData: RingData[] = [];
         try{
             newRingsData = await getRingData();
+            setIsLoadedData(true);
         }catch(error){
             // リングデータを取得できなかった際のエラーハンドリング
             showErrorToast("E099"); // 「システムエラー」というメッセージを表示する
