@@ -9,7 +9,7 @@ import { API_URL } from '../constants';
 async function makeGetRequest(apiEndpoint: string, queryParams?: string): Promise<Response>{
     try {
         const url: string = API_URL + apiEndpoint + (queryParams ?? '');
-        // console.log({url})
+        console.log({url})
         const response = await fetch(url);
         if(response.ok){
             return response;
@@ -34,7 +34,7 @@ export async function getLocationConfig(): Promise<FeatureCollection<Point>>{
     if(cashData){
         const locationData = JSON.parse(cashData) as FeatureCollection<Point>;
         result = locationData;
-        // console.log("キャッシュからgeolocationデータを読み込みました", locationData);
+        console.log("キャッシュからgeolocationデータを読み込みました", locationData);
     }else{
         // キャッシュデータがない場合、サーバーからデータを取得する
         const apiEndpoint: string = "locations";
@@ -88,7 +88,7 @@ async function getLatestInstanceId(apiEndpoint: string): Promise<string | null>{
         }
     }, null);
     const latestInstanceId: string | null = latestInstance?.id ?? null; // 有効なインスタンスが一つもない場合は、nullを返す
-// console.log({data, latestInstance})
+console.log({data, latestInstance})
     return latestInstanceId;
 }
 
@@ -96,7 +96,7 @@ async function getLatestInstanceId(apiEndpoint: string): Promise<string | null>{
 async function makePostRequest(apiEndpoint: string, data: Object): Promise<Response>{
     try {
         const url: string = API_URL + apiEndpoint;
-        // console.log({url, data})
+        console.log({url, data})
         const response: Response = await fetch(url, {
             method: 'POST',
             mode: "cors",
@@ -105,12 +105,12 @@ async function makePostRequest(apiEndpoint: string, data: Object): Promise<Respo
             },
             body: JSON.stringify(data)
         })
-        // console.log({apiEndpoint: response})
+        console.log({apiEndpoint: response})
         if(response.ok){
             // HTTPステータスコードが2xx（成功）の場合にレスポンスを返す
             return response;
         }else{
-            // console.log(response.status)
+            console.log(response.status)
             // エラーレスポンスの場合はエラーハンドリングを行う
             throw new Error(`HTTPエラー: ${response.status}`);
         }

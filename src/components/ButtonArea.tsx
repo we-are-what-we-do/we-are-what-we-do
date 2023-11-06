@@ -21,7 +21,7 @@ import { ICON_SIZE, ICON_COLOR, DISABLED_COLOR, BUTTON_MARGIN } from "./../App";
 import { useDispatch } from "react-redux";
 import { AppDispatch, useAppSelector } from "../redux/store";
 import { changeButtonState } from "../redux/features/buttonState-slice";
-// import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { ImageData } from "../types";
 
 // ボタン類のコンポーネント

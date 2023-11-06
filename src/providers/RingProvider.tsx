@@ -8,7 +8,7 @@ import { TorusInfo, pushTorusInfo, resetHandle } from '../redux/features/torusIn
 import { RingData, convertToTorus, getAvailableIndex, getIso8601DateTime, getRingColor } from '../handleRingData';
 import { Ring, positionArray, torusScale } from '../torusPosition';
 import { v4 as uuidv4 } from 'uuid';
-// import { TEST_LOCATION_ID } from '../constants';
+import { TEST_LOCATION_ID } from '../constants';
 
 
 /* 型定義 */
