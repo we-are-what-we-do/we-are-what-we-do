@@ -25,7 +25,8 @@ import { ImageData } from "../types";
 
 
 // リングデータがコンフリクトした際のエラーレスポンスのメッセージ
-const CONFLICT_RING_MESSAGE: string = "Conflict in, `RingSet`. `Index` should be Unique within a defined value.";
+const CONFLICT_INDEX_MESSAGE: string = "Conflict in, `RingSet`. `Index` should be Unique within a defined value.";
+const CONFLICT_USER_ID_MESSAGE: string = "Conflict in, `Ring`. `UserId` conflicts with the last registered user.";
 
 
 // ボタン類のコンポーネント
@@ -159,8 +160,9 @@ export default function ButtonArea(props: {
                     // リングデータ送信失敗時のエラーハンドリングを行う
                     if(!ringResponse.ok){
                         switch(responseData.error){
-                            case CONFLICT_RING_MESSAGE:
-                                throw new Error(CONFLICT_RING_MESSAGE);
+                            case CONFLICT_INDEX_MESSAGE:
+                            case CONFLICT_USER_ID_MESSAGE:
+                                throw new Error(responseData.error);
                             default:
                                 throw new Error("リングデータ送信エラー");
                         }
@@ -189,22 +191,20 @@ export default function ButtonArea(props: {
                     saveImage(newImage);
                 }catch(error: any){
                     // サーバーにリングデータを送信できなかった際のエラーハンドリング
-                    if(error.message === CONFLICT_RING_MESSAGE){
-                        console.error("送信しようとしたリングデータがコンフリクトを起こしました", error);
-
-                        // データを更新する
-                        await initializeRingData();
-
-                        // 「再度、お試しください。」というメッセージボックスを表示する
-                        showErrorToast("E005");
-                    }else{
-                        console.error("リング・画像データの送信に失敗しました", error);
-
-                        // 「システムエラー」というメッセージボックスを表示する
-                        showErrorToast("E099");
+                    switch(error.message){
+                        case CONFLICT_INDEX_MESSAGE:
+                            console.error("送信しようとしたリングデータがコンフリクトを起こしました", error);
+                            await initializeRingData(); // データを更新する
+                            showErrorToast("E005"); // 「再度、お試しください。」というメッセージボックスを表示する
+                            break;
+                        case CONFLICT_USER_ID_MESSAGE:
+                            console.error("送信するリングデータのユーザーIDが前回登録者と被っています", error);
+                            showWarnToast("I002"); // 「連続撮影はできません。」というメッセージボックスを表示する
+                            break;
+                        default:
+                            console.error("リング・画像データの送信に失敗しました", error);
+                            showErrorToast("E099"); // 「システムエラー」というメッセージボックスを表示する
                     }
-                    
-
                 }
             }else{
                 // 再撮影を望む場合、処理を止める
