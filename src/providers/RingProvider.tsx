@@ -211,7 +211,6 @@ export function RingProvider({children}: {children: ReactNode}){
         };
 
         // newRingData.user = uuidv4(); // TODO テスト用のランダムユーザーIDをやめる
-        newRingData.user = TEST_LOCATION_ID;
 
         return newRingData;
     }
