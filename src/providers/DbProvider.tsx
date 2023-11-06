@@ -46,6 +46,7 @@ export function DbProvider({children}: {children: ReactNode}){
     // 初回レンダリング時、サーバーからデータを取得する
     useEffect(() => {
         initializeRingData();
+        console.log("isLoadedData is OK");
     }, [])
 
     // リングのデータを、サーバーから取得したデータで初期化する関数

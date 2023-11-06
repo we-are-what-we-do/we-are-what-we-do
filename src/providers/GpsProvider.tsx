@@ -61,6 +61,7 @@ export function GpsProvider({children}: {children: ReactNode}){
                         // 位置情報が変更されたときに呼び出されるコールバック
                         handleChangePosition(position, data, true).then(() => {
                             setIsLoadedGps(true);
+                            console.log("isLoadedGps is OK");
                         });
                     },
                     (error) => {
