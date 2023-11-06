@@ -159,12 +159,11 @@ export default function ButtonArea(props: {
 
                     // リングデータ送信失敗時のエラーハンドリングを行う
                     if(!ringResponse.ok){
-                        switch(responseData.error){
-                            case CONFLICT_INDEX_MESSAGE:
-                            case CONFLICT_USER_ID_MESSAGE:
-                                throw new Error(responseData.error);
-                            default:
-                                throw new Error("リングデータ送信エラー");
+                        const errorResponseMessage: string | undefined = responseData.error;
+                        if(errorResponseMessage){
+                            throw new Error(errorResponseMessage);
+                        }else{
+                            throw new Error("リングデータ送信エラー");
                         }
                     }
 
