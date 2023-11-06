@@ -21,8 +21,12 @@ import { ICON_SIZE, ICON_COLOR, DISABLED_COLOR, BUTTON_MARGIN } from "./../App";
 import { useDispatch } from "react-redux";
 import { AppDispatch, useAppSelector } from "../redux/store";
 import { changeButtonState } from "../redux/features/buttonState-slice";
-import { v4 as uuidv4 } from "uuid";
 import { ImageData } from "../types";
+
+
+// リングデータがコンフリクトした際のエラーレスポンスのメッセージ
+const CONFLICT_RING_MESSAGE: string = "Conflict in, `RingSet`. `Index` should be Unique within a defined value.";
+
 
 // ボタン類のコンポーネント
 export default function ButtonArea(props: {
@@ -150,10 +154,20 @@ export default function ButtonArea(props: {
                     // リングデータを送信する
                     const ringResponse: Response = await postRingData(addedRingData); // サーバーにリングデータを送信する
                     const responseData = await ringResponse.json();
-                    console.log({ringResponse, responseData})
+                    console.log({ringResponse, responseData, responseStatus: ringResponse.status})
+
+                    // リングデータ送信失敗時のエラーハンドリングを行う
+                    if(!ringResponse.ok){
+                        switch(responseData.error){
+                            case CONFLICT_RING_MESSAGE:
+                                throw new Error(CONFLICT_RING_MESSAGE);
+                            default:
+                                throw new Error("リングデータ送信エラー");
+                        }
+                    }
 
                     // 画像データを送信する
-                    if(!responseData.id) console.error("リングデータ(POST)のレスポンスにidが含まれていません\n", responseData);
+                    if(!responseData.id) throw new Error("リングデータ(POST)のレスポンスに、画像データの送信に必要なidが返って来ませんでした");
                     const imageData: ImageData = { // 送信用画像データオブジェクトを作成する
                         ring_id: responseData.id,
                         created_at: addedRingData.created_at,
@@ -173,21 +187,24 @@ export default function ButtonArea(props: {
 
                     // 撮影した写真をダウンロードする
                     saveImage(newImage);
-                }catch(error){
+                }catch(error: any){
                     // サーバーにリングデータを送信できなかった際のエラーハンドリング
-                    console.error(
-                        "サーバーにデータを送信できませんでした", "\n",
-                        "以下の可能性があります", "\n",
-                        "- 送信しようとしたリングデータがコンフリクトを起こした", "\n",
-                        "- サーバーにアクセスできない", "\n",
-                        error
-                    );
+                    if(error.message === CONFLICT_RING_MESSAGE){
+                        console.error("送信しようとしたリングデータがコンフリクトを起こしました", error);
 
-                    // データを更新する
-                    await initializeRingData();
+                        // データを更新する
+                        await initializeRingData();
 
-                    // 「再度、お試しください。」というメッセージボックスを表示する
-                    showErrorToast("E005");
+                        // 「再度、お試しください。」というメッセージボックスを表示する
+                        showErrorToast("E005");
+                    }else{
+                        console.error("リング・画像データの送信に失敗しました", error);
+
+                        // 「システムエラー」というメッセージボックスを表示する
+                        showErrorToast("E099");
+                    }
+                    
+
                 }
             }else{
                 // 再撮影を望む場合、処理を止める
