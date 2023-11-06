@@ -110,14 +110,14 @@ async function makePostRequest(apiEndpoint: string, data: Object): Promise<Respo
             // HTTPステータスコードが2xx（成功）の場合にレスポンスを返す
             return response;
         }else{
-            console.log(response.status)
             // エラーレスポンスの場合はエラーハンドリングを行う
-            throw new Error(`HTTPエラー: ${response.status}`);
+            console.error(`HTTPエラー: ${response.status}`);
+            return response; // エラーレスポンスを返す
         }
     }catch(error){
         // エラーハンドリング
         console.error('POSTリクエストエラー:', error);
-        throw error;
+        throw error; // Errorを返す
     }
 }
 

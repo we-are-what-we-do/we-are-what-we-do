@@ -8,9 +8,9 @@ interface ConfirmToastProps {
   onNo: () => void;
 }
 
-const messageI004 = INFO_MESSAGES.I004;
-const messageI004y = INFO_MESSAGES.I004y;
-const messageI004n = INFO_MESSAGES.I004n;
+const messageI004: string[] = INFO_MESSAGES.I004 as string[];
+const messageI004y: string = INFO_MESSAGES.I004y as string;
+const messageI004n: string = INFO_MESSAGES.I004n as string;
 
 export const ConfirmToast: React.FC<ConfirmToastProps> = ({ onYes, onNo }) => {
   return(
@@ -20,13 +20,17 @@ export const ConfirmToast: React.FC<ConfirmToastProps> = ({ onYes, onNo }) => {
       alignItems="center"
     >
       <Grid item xs={12}>
-        <div className="message">{messageI004}</div>
+        <div className="message">
+        {messageI004.map((value, index) => (
+          <div key={index}>{value}</div>
+        ))}
+        </div>
       </Grid>
       <Grid item xs={12}>
         <Button
           variant="contained"
           onClick={onYes}
-          style={{width: "10rem"}}
+          style={{whiteSpace: "nowrap"}}
         >
           {messageI004y}
         </Button>
@@ -35,7 +39,7 @@ export const ConfirmToast: React.FC<ConfirmToastProps> = ({ onYes, onNo }) => {
         <Button
           variant="outlined"
           onClick={onNo}
-          style={{width: "10rem", backgroundColor: "white"}}
+          style={{backgroundColor: "white"}}
         >
           {messageI004n}
         </Button>
