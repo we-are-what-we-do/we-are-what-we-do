@@ -210,7 +210,8 @@ export function RingProvider({children}: {children: ReactNode}){
             created_at: getIso8601DateTime() // 撮影日時
         };
 
-        newRingData.user = uuidv4(); // TODO テスト用のランダムユーザーIDをやめる
+        // newRingData.user = uuidv4(); // TODO テスト用のランダムユーザーIDをやめる
+        newRingData.user = TEST_LOCATION_ID;
 
         return newRingData;
     }
