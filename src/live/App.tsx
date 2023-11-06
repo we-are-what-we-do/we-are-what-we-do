@@ -76,7 +76,7 @@ function App() {
 
     const intervalFunc = setInterval(() => {
       initializeRingData();
-        console.log("リングデータを更新しました");
+        // console.log("リングデータを更新しました");
     }, intervalTime);
     
     return () => clearInterval(intervalFunc);
@@ -92,7 +92,7 @@ function App() {
    */
 
   function initializeRingDraw(): void {
-    dispatch(resetHandle());
+    dispatch(resetHandle()); // 全3Dを消去する
   
     const extractedRingData: RingData[] = getLatestLap(ringsData);
     extractedRingData.forEach((value) => {

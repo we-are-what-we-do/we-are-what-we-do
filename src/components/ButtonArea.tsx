@@ -48,16 +48,14 @@ export default function ButtonArea(props: {
 
     // IPの状態を管理するcontext
     const {
-        // userFlag
+        userFlag
     } = useContext(UserContext);
-    const userFlag: boolean = true;// TODO 連続撮影機能(テスト)を削除する
 
     // GPSの状態を管理するcontext
     const {
-        // gpsFlag,
+        gpsFlag,
         isLoadedGps
     } = useContext(GpsContext);
-    const gpsFlag: boolean = true;// TODO どこでもリング表示機能(テスト)を削除する
 
     // リングのデータを追加するためのcontext
     const {
@@ -148,10 +146,9 @@ export default function ButtonArea(props: {
 
                 try{
                     // リングデータを送信する
-                    addedRingData.user = uuidv4(); // TODO テスト用のランダムユーザーIDをやめる
                     const ringResponse: Response = await postRingData(addedRingData); // サーバーにリングデータを送信する
                     const responseData = await ringResponse.json();
-                    console.log({responseData})
+                    console.log({ringResponse, responseData})
 
                     // 画像データを送信する
                     if(!responseData.id) console.error("リングデータ(POST)のレスポンスにidが含まれていません\n", responseData);

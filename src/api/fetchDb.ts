@@ -116,8 +116,7 @@ async function makePostRequest(apiEndpoint: string, data: Object): Promise<Respo
         }
     }catch(error){
         // エラーハンドリング
-        console.log(error)
-        // console.error('POSTリクエストエラー:', error.message);
+        console.error('POSTリクエストエラー:', error);
         throw error;
     }
 }

@@ -3,6 +3,7 @@ import { Feature, FeatureCollection, GeoJsonProperties, Point } from 'geojson';
 import { getLocationConfig } from '../api/fetchDb';
 import { haversineDistance } from '../api/distanceCalculations';
 import { showInfoToast, showTestToast, showWarnToast } from '../components/ToastHelpers';
+import { TEST_LOCATION_ID } from '../constants';
 
 
 /* 定数定義 */
@@ -107,7 +108,8 @@ export function GpsProvider({children}: {children: ReactNode}){
         setCurrentPositions(position);
 
         // 現在地の取得とピンの位置を比較する
-        const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData, isFirstDone);
+        // const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData, isFirstDone);
+        const locationId: string | null = TEST_LOCATION_ID; // テスト用ロケーションIDを使用しないよう修正
 
         // 比較した結果をstateに保存する
         setLocation(locationId); // ロケーションIDを保存する

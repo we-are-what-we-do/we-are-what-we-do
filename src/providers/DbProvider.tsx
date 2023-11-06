@@ -62,17 +62,11 @@ export function DbProvider({children}: {children: ReactNode}){
         // リングデータを70個までに限定して切り出す(一応)
         const extractedRingData: RingData[] = getLatestLap(newRingsData);
         const newLatestRing: RingData | null = getLatestRing(newRingsData);
-        console.log({newLatestRing});
+        // console.log({newLatestRing});
         let newTori: TorusInfo[] = convertToTori(newRingsData);
         setRingsData(extractedRingData);
         setLatestRing(newLatestRing);
         setTori(newTori);
-
-        // TODO セキュリティの観点から、後で消す
-        console.log(
-            "サーバーからデータを取得しました:\n", newRingsData,
-            "\nリング数:", Object.keys(newRingsData).length
-        );
     }
 
     // torusArrayに新しいtorusデータを一つ追加する関数

@@ -68,7 +68,7 @@ export function CameraProvider({children}: {children: ReactNode}){
 
         if(enableOutStream || enableInStream || enableOtherStream){
             // いずれかのカメラ接続に成功した場合
-            console.log("カメラのアクセスに成功");
+            // console.log("カメラのアクセスに成功");
             // window.alert("カメラのアクセスに成功");
 
             // アウトカメラ > インカメラ > 他カメラの優先度でstreamを設定する
