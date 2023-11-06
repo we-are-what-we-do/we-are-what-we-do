@@ -50,12 +50,14 @@ export default function ButtonArea(props: {
     const {
         userFlag
     } = useContext(UserContext);
+    // const userFlag = true; // TODO テスト用プログラムの修正
 
     // GPSの状態を管理するcontext
     const {
         gpsFlag,
         isLoadedGps
     } = useContext(GpsContext);
+    // const gpsFlag = true; // TODO テスト用プログラムの修正
 
     // リングのデータを追加するためのcontext
     const {
