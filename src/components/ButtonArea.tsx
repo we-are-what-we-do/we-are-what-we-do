@@ -146,10 +146,9 @@ export default function ButtonArea(props: {
 
                 try{
                     // リングデータを送信する
-                    // addedRingData.user = uuidv4(); // TODO テスト用のランダムユーザーIDをやめる
                     const ringResponse: Response = await postRingData(addedRingData); // サーバーにリングデータを送信する
                     const responseData = await ringResponse.json();
-                    console.log({responseData})
+                    console.log({ringResponse, responseData})
 
                     // 画像データを送信する
                     if(!responseData.id) console.error("リングデータ(POST)のレスポンスにidが含まれていません\n", responseData);
