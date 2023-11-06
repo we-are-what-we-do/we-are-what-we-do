@@ -47,6 +47,7 @@ export function DbProvider({children}: {children: ReactNode}){
     useEffect(() => {
         initializeRingData().then(() => {
             setIsLoadedData(true);
+            console.log("isLoadedData is OK");
         });
     }, [])
 
