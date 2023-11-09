@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
+import { createContext, useState, ReactNode, useEffect, useContext, useRef } from 'react';
 import { DbContext } from './DbProvider';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -7,14 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 // contextに渡すデータの型
 type Context = {
     userFlag: boolean;
-    userId: string | null;
+    userIdRef: React.MutableRefObject<string | null>;
 };
 
 
 /* Provider */
 const initialData: Context = {
     userFlag: false,
-    userId: null
+    userIdRef: {} as React.MutableRefObject<string | null>
 };
 
 export const UserContext = createContext<Context>(initialData);
@@ -23,7 +23,7 @@ export const UserContext = createContext<Context>(initialData);
 export function UserProvider({children}: {children: ReactNode}){
     /* useState, useContext等 */
     const [userFlag, setUserFlag] = useState<boolean>(false); // 現在のユーザーIDと前回登録者のユーザーIDが同じではないかどうかフラグ
-    const [userId, setUserId] = useState<string | null>(null); // ユーザーの一意ID
+    const userIdRef = useRef<string | null>(null); // ユーザーの一意ID
 
     // サーバーから取得したリングデータを管理するcontext
     const {
@@ -36,7 +36,7 @@ export function UserProvider({children}: {children: ReactNode}){
     useEffect(() => {
         const currentUserId: string = getCurrentUserId();
         const isDifferentUser: boolean = compareUserId(currentUserId);
-        setUserId(currentUserId);
+        if(!userIdRef.current) userIdRef.current = currentUserId;
         setUserFlag(isDifferentUser);
 
         // console.log({userId: currentUserId, userFlag: isDifferentUser, latestUserId: latestRing?.user})
@@ -79,7 +79,7 @@ export function UserProvider({children}: {children: ReactNode}){
         <UserContext.Provider
             value={{
                 userFlag,
-                userId
+                userIdRef
             }}
         >
             {children}

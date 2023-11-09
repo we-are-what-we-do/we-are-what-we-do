@@ -24,11 +24,6 @@ import { changeButtonState } from "../redux/features/buttonState-slice";
 import { ImageData } from "../types";
 
 
-// リングデータがコンフリクトした際のエラーレスポンスのメッセージ
-const CONFLICT_INDEX_MESSAGE: string = "Conflict in, `RingSet`. `Index` should be Unique within a defined value.";
-const CONFLICT_USER_ID_MESSAGE: string = "Conflict in, `Ring`. `UserId` conflicts with the last registered user.";
-
-
 // ボタン類のコンポーネント
 export default function ButtonArea(props: {
     theme: Theme;
@@ -46,9 +41,7 @@ export default function ButtonArea(props: {
 
     // サーバーからリングデータを取得するためのcontext
     const {
-        initializeRingData,
-        setLatestRing,
-        isLoadedData
+        setLatestRing
     } = useContext(DbContext);
 
     // IPの状態を管理するcontext
@@ -79,13 +72,16 @@ export default function ButtonArea(props: {
 
     // 写真撮影(リング+カメラ)のためのcontext
     const {
-        captureImage,
-        saveImage
+        captureImage
     } = useContext(CaptureContext);
 
     // websocketを管理するcontext
     const {
-        hasPostRing
+        isLoadedData,
+        hasPostRing,
+        socketRef,
+        base64Ref,
+
     } = useContext(SocketContext);
 
     // 画面幅がmd以上かどうか
@@ -148,63 +144,12 @@ export default function ButtonArea(props: {
                     return;
                 }
 
-                // サーバー送信用に画像データの型付けを取り除く
-                const base64Str = newImage.split(',')[1]; // "data:image/png;base64"は省略されて取得される
+                // リングデータを送信する
+                socketRef.current?.send(JSON.stringify(addedRingData));
+                console.log("サーバーにデータを送信しました:\n", addedRingData);
 
-                try{
-                    // リングデータを送信する
-                    const ringResponse: Response = await postRingData(addedRingData); // サーバーにリングデータを送信する
-                    const responseData = await ringResponse.json();
-                    console.log({ringResponse, responseData, responseStatus: ringResponse.status})
-
-                    // リングデータ送信失敗時のエラーハンドリングを行う
-                    if(!ringResponse.ok){
-                        const errorResponseMessage: string | undefined = responseData.error;
-                        if(errorResponseMessage){
-                            throw new Error(errorResponseMessage);
-                        }else{
-                            throw new Error("リングデータ送信エラー");
-                        }
-                    }
-
-                    // 画像データを送信する
-                    if(!responseData.id) throw new Error("リングデータ(POST)のレスポンスに、画像データの送信に必要なidが返って来ませんでした");
-                    const imageData: ImageData = { // 送信用画像データオブジェクトを作成する
-                        ring_id: responseData.id,
-                        created_at: addedRingData.created_at,
-                        image: base64Str
-                    };
-                    await postImageData(imageData); // base64形式の画像をサーバーに送信する
-                    console.log("サーバーにデータを送信しました:\n", addedRingData);
-
-                    // latestRingを更新する
-                    setLatestRing(addedRingData);
-
-                    // リングデータを送信済みとしてrefを更新する
-                    hasPostRing.current = true;
-
-                    // 「ARリングの生成に成功しました。」というメッセージボックスを表示する
-                    showSuccessToast("I005");
-
-                    // 撮影した写真をダウンロードする
-                    saveImage(newImage);
-                }catch(error: any){
-                    // サーバーにリングデータを送信できなかった際のエラーハンドリング
-                    switch(error.message){
-                        case CONFLICT_INDEX_MESSAGE:
-                            console.error("送信しようとしたリングデータがコンフリクトを起こしました", error);
-                            await initializeRingData(); // データを更新する
-                            showErrorToast("E005"); // 「再度、お試しください。」というメッセージボックスを表示する
-                            break;
-                        case CONFLICT_USER_ID_MESSAGE:
-                            console.error("送信するリングデータのユーザーIDが前回登録者と被っています", error);
-                            showWarnToast("I002"); // 「連続撮影はできません。」というメッセージボックスを表示する
-                            break;
-                        default:
-                            console.error("リング・画像データの送信に失敗しました", error);
-                            showErrorToast("E099"); // 「システムエラー」というメッセージボックスを表示する
-                    }
-                }
+                // 画像データを送信待機用refに保存する(レスポンスを受け取ったら送信する予定)
+                base64Ref.current = newImage;
             }else{
                 // 再撮影を望む場合、処理を止める
                 // console.log("撮影やり直しのために処理を中断しました");

@@ -3,11 +3,14 @@ import { postRingData } from './../api/fetchDb';
 import { DbContext } from "../providers/DbProvider";
 import { RingContext } from "./../providers/RingProvider";
 import { SocketContext } from "../providers/SocketProvider";
-import { RingData, getIso8601DateTime } from "../handleRingData";
+import { RingData, convertToTorus, getAvailableIndex, getIso8601DateTime } from "../handleRingData";
 import { positionArray } from "./../torusPosition";
 import { GpsContext } from "../providers/GpsProvider";
 import { v4 as uuidv4 } from 'uuid';
 import { TEST_LOCATION_ID } from "../constants";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../redux/store";
+import { TorusInfo, pushTorusInfo } from "../redux/features/torusInfo-slice";
 
 
 export default function TestButtons() {
@@ -20,15 +23,13 @@ export default function TestButtons() {
     // リングのデータを追加するためのcontext
     const {
         getRingDataToAdd,
-        addTorus,
         usedOrbitIndexes,
-        setUsedOrbitIndexes
+        addedTorus
     } = useContext(RingContext);
 
     // websocketを管理するcontext
     const {
-        hasPostRing,
-        // socketRef
+        socketRef
     } = useContext(SocketContext);
 
     // GPSの状態を管理するcontext
@@ -37,66 +38,36 @@ export default function TestButtons() {
         currentLongitude
     } = useContext(GpsContext);
 
+    // reduxのdispatch
+    const dispatch = useDispatch<AppDispatch>();
+
+
     /* 関数定義 */
     // サーバーにリングを追加する処理(テスト用)
     async function testAddRing(): Promise<void>{
         let addedRingData: RingData | null = null;
-        if(hasPostRing.current){
-            // 初期追加のリングを送信済みの場合
-            // リングを追加して描画する
-            const newTorus = addTorus(usedOrbitIndexes).torusData;
+        const testUser: string = uuidv4();
+        console.log("testUser:", testUser)
 
-            // 描画に追加したリングのデータを取得する
-            addedRingData = generateTestRingData(newTorus.orbitIndex, newTorus.ringHue);
-
-            setUsedOrbitIndexes((prev) => [...prev, addedRingData!.indexed]);
-        }else{
-            // まだ初期追加のリングを送信していない場合
-            // 既に描画に追加したリングのデータを取得する
-            addedRingData = getRingDataToAdd();
-            if(!addedRingData){
-                console.error("追加したリングデータを取得できませんでした");
-                return;
-            };
-            addedRingData.user = uuidv4(); // ユーザーidのみランダムなものに変更しておく
-
-            hasPostRing.current = true; // リングデータを送信済みとしてstateを更新する
+        // 既に描画に追加したリングのデータを送信する
+        addedRingData = getRingDataToAdd(addedTorus?.torusData, testUser);
+        if(!addedRingData){
+            console.error("追加したリングデータを取得できませんでした");
+            return;
         };
+        addedRingData.user = testUser;
 
         //サーバーにリングデータを送信する
-        console.log("testUser:", addedRingData.user)
-        await postRingData(addedRingData);
-        // socketRef.current?.send(JSON.stringify(addedRingData));
+        socketRef.current?.send(JSON.stringify(addedRingData));
         console.log("サーバーにデータを送信しました:\n", addedRingData);
+
+        // 送信したリングを描画する(現在のやつはコンフリクトして消えるので)
+        const torus: TorusInfo = convertToTorus(addedRingData);
+        dispatch(pushTorusInfo(torus));
 
         // テスト用のstate更新
         setLatestRing(addedRingData);
     }
-
-    // ランダムにリングデータを作成する関数
-    function generateTestRingData(orbitIndex: number, ringHue: number): RingData{
-        return {
-            location: TEST_LOCATION_ID,
-            latitude: 0, // 撮影地点の緯度
-            longitude: 0, // 撮影地点の経度
-            user: uuidv4(), // ユーザーID
-            indexed: orbitIndex, // リング軌道内の順番(DEI中の何個目か、0~70)
-            hue: ringHue, // リングの色調
-            created_at: getIso8601DateTime() // 撮影日時
-        };
-    }
-
-    // サーバーからリングデータを削除する処理(テスト用)
-    async function testDeleteRing(): Promise<void>{
-        await fetch("https://wawwdtestdb-default-rtdb.firebaseio.com/rings.json", {
-            method: 'DELETE'
-        });
-        await fetch("https://wawwdtestdb-default-rtdb.firebaseio.com/nft.json", {
-            method: 'DELETE'
-        });
-        location.reload();
-    }
-
 
     return (
         <div
@@ -113,14 +84,6 @@ export default function TestButtons() {
                 }}
             >
                 リング追加(テスト用)
-            </button>
-            <button
-                onClick={testDeleteRing}
-                style={{
-                    position: "relative",
-                }}
-            >
-                リングデータ削除(テスト用)
             </button>
             <br/>
             <span
