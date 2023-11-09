@@ -137,7 +137,6 @@ export function SocketProvider({children}: {children: ReactNode}){
                         return;
                 }
             }
-            console.log("reason", data.reason, data.reason === CONFLICT_USER_ID_MESSAGE, event.data.reason === CONFLICT_INDEX_MESSAGE)
 
             // 送信元やタイミングによって処理を行う
             if(data.rings){

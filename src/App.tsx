@@ -154,7 +154,7 @@ export default function App() {
           )}
         </div>
       </div>
-      <TestButtons/>
+      <TestButtons/>{/* TODO テスト用ボタンは本番では表示しない */}
       <ThemeProvider theme={theme}>
         <ButtonArea
           theme={theme}

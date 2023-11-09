@@ -107,8 +107,7 @@ export function GpsProvider({children}: {children: ReactNode}){
         setCurrentPositions(position);
 
         // 現在地の取得とピンの位置を比較する
-        // const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData, isFirstDone);
-        const locationId: string | null = TEST_LOCATION_ID; // テスト用ロケーションIDを使用しないよう修正
+        const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData, isFirstDone) ?? TEST_LOCATION_ID; // TODO テスト用ロケーションIDを使用しないよう修正
 
         // 比較した結果をstateに保存する
         setLocation(locationId); // ロケーションIDを保存する
