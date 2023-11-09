@@ -1,6 +1,5 @@
 import "./App.css";
 import { useContext, useEffect, useRef, useState } from "react";
-import { DbContext } from "./providers/DbProvider";
 import { CaptureContext } from "./providers/CaptureProvider";
 import { GpsContext } from "./providers/GpsProvider";
 import { OrbitControls } from "@react-three/drei";
@@ -14,6 +13,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CircularProgress } from "@mui/material";
 import { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useAppSelector } from "./redux/store";
+import { SocketContext } from "./providers/SocketProvider";
+import TestButtons from "./components/TestButtons";
 
 
 /* 定数定義 */
@@ -45,20 +46,21 @@ const theme = createTheme({
 
 export default function App() {
   /* stateやcontext等 */
-  const {
-    isLoadedData
-  } = useContext(DbContext);
-
   // 写真撮影(リング+カメラ)のためのcontext
   const {
     canvasRef
   } = useContext(CaptureContext);
-  
+
   // GPSの状態を管理するcontext
   const {
     gpsFlag,
     isLoadedGps
   } = useContext(GpsContext);
+
+  // websocketを管理するcontext
+  const {
+    isLoadedData
+  } = useContext(SocketContext);
 
   // 撮影ボタンの処理中かどうか
   const isTakingPhoto = useRef<boolean>(false);
@@ -152,6 +154,7 @@ export default function App() {
           )}
         </div>
       </div>
+      <TestButtons/>
       <ThemeProvider theme={theme}>
         <ButtonArea
           theme={theme}

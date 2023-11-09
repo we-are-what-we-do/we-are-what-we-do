@@ -2,7 +2,7 @@ import { createContext, useState, ReactNode, useEffect } from 'react';
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from 'geojson';
 import { getLocationConfig } from '../api/fetchDb';
 import { haversineDistance } from '../api/distanceCalculations';
-import { showInfoToast, showTestToast, showWarnToast } from '../components/ToastHelpers';
+import { showErrorToast, showInfoToast, showTestToast, showWarnToast } from '../components/ToastHelpers';
 import { TEST_LOCATION_ID } from '../constants';
 
 
@@ -58,6 +58,7 @@ export function GpsProvider({children}: {children: ReactNode}){
                 setGeoJsonData(data);
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
+                        console.log("GPS done")
                         // 位置情報が変更されたときに呼び出されるコールバック
                         handleChangePosition(position, data, true).then(() => {
                             setIsLoadedGps(true);
@@ -65,11 +66,8 @@ export function GpsProvider({children}: {children: ReactNode}){
                         });
                     },
                     (error) => {
-                        if(error.code === error.PERMISSION_DENIED){
-                            showWarnToast("E002"); // 「位置情報のアクセスを許可してください」というメッセージを表示する
-                        }else{
-                            showWarnToast("E099"); // 「システムエラー」というメッセージを表示する
-                        }
+                        console.log("GPS error")
+                        showErrorToast("E002");
                     },
                     { enableHighAccuracy: true } // 高い精度を要求
                 );

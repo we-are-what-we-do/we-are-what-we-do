@@ -12,10 +12,8 @@ import { getRingData } from "../api/fetchDb";
 // contextに渡すデータの型
 type DbContent = {
     ringsData: RingData[];
-    latestRing: RingData | null;
-    toriData: TorusInfo[];
     initializeRingData: (location?: string) => Promise<void>;
-    addTorusData: (newTorus: TorusInfo) => void;
+    latestRing: RingData | null;
     setLatestRing: React.Dispatch<React.SetStateAction<RingData | null>>;
     isLoadedData: boolean;
 };
@@ -24,10 +22,8 @@ type DbContent = {
 /* Provider */
 const initialData: DbContent = {
     ringsData: [],
-    latestRing: null,
-    toriData: [],
     initializeRingData: () => Promise.resolve(),
-    addTorusData: () => {},
+    latestRing: null,
     setLatestRing: () => null,
     isLoadedData: true
 };
@@ -38,7 +34,6 @@ export function DbProvider({children}: {children: ReactNode}){
     // リングのデータを管理する
     const [ringsData, setRingsData] = useState<RingData[]>([]); // サーバーから取得したリングデータ
     const [latestRing, setLatestRing] = useState<RingData | null>(null); // 直前に追加されたリングデータ
-    const [toriData, setTori] = useState<TorusInfo[]>([]); // Three.jsで使用するリングデータ
 
     // データを取得済みかどうかを管理する
     const [isLoadedData, setIsLoadedData] = useState<boolean>(false);
@@ -60,26 +55,14 @@ export function DbProvider({children}: {children: ReactNode}){
         let newTori: TorusInfo[] = convertToTori(newRingsData);
         setRingsData(extractedRingData);
         setLatestRing(newLatestRing);
-        setTori(newTori);
     }
-
-    // torusArrayに新しいtorusデータを一つ追加する関数
-    function addTorusData(newTorus: TorusInfo): void{
-        setTori((prevTori) => {
-            const newTori: TorusInfo[] = prevTori.slice();
-            newTori.push(newTorus);
-            return newTori;
-        });
-    };
 
     return (
         <DbContext.Provider
             value={{
                 ringsData,
                 latestRing,
-                toriData,
                 initializeRingData,
-                addTorusData,
                 setLatestRing,
                 isLoadedData
             }}

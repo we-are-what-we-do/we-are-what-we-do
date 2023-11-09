@@ -17,7 +17,7 @@ export function Providers({ children }: {children: React.ReactNode}) {
             <RingProvider>{/* DbProvider, UserProvider, GpsProvider配下にRingProviderを設置 */}
               <CameraProvider>
                 <CaptureProvider>{/* CameraProvider配下にCaptureProviderを設置 */}
-                  <SocketProvider>
+                  <SocketProvider>{/* DbProvider, UserProvider, RingProvider配下にRingProviderを設置 */}
                     {children}
                   </SocketProvider>
                 </CaptureProvider>

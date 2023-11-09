@@ -18,6 +18,7 @@ export type RingData = {
     "hue": number; // リングの色調 (0～360)
     "user": string; // ユーザーID (UUID)
     "created_at": string; // 撮影日時 (ISO8601)
+    "nonce"?: string; // websocket送信者のID(UUID)
 };
 
 

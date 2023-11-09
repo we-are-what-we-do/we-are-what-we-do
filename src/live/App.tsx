@@ -12,7 +12,7 @@ import { TorusInfo, pushTorusInfo, resetHandle } from "./../redux/features/torus
 import { getUpdateTime } from "./redux/features/updateTime-slice";
 import { RingData, convertToTorus } from "./../handleRingData";
 
-import { DbContext, getLatestLap } from "./../providers/DbProvider";
+import { DbContext } from "./../providers/DbProvider";
 import { FeatureCollection, Point } from "geojson";
 import { getLocationConfig, getLocationJp, getRingData } from "../api/fetchDb";
 
@@ -21,14 +21,7 @@ function App() {
   const dispatch = useDispatch<AppDispatch>();
   
   // サーバーから取得したリングデータを管理するcontext
-  const { ringsData, latestRing, initializeRingData } = useContext(DbContext);
-
-
-  // リングの表示を行う
-  useEffect(() => {
-    initializeRingDraw();
-  }, [ringsData]);
-
+  const { latestRing } = useContext(DbContext);
 
   // データ更新時、全データを取得し、リング数を取得する
   const [ringCount, setRingCount] = useState<number>(0);
@@ -38,7 +31,7 @@ function App() {
           const newRingCount: number = Object.keys(ringsData).length;
           setRingCount(newRingCount);
       })
-  }, [ringsData]);
+  }, []);
 
 
   // 最終更新日の表示を行う
@@ -71,36 +64,15 @@ function App() {
 
   // 一定時間おきにサーバーからデータを取得し、リング表示を初期化する
   useEffect(() => {
-    initializeRingData();
+    // initializeRingData();
     const intervalTime: number = 1000 * 60 * 1; // 1分置きに更新する
 
     const intervalFunc = setInterval(() => {
-      initializeRingData();
+      // initializeRingData();
         // console.log("リングデータを更新しました");
     }, intervalTime);
-    
     return () => clearInterval(intervalFunc);
   }, []);
-
-
-  /**
-   * 現在のリングのデータ(ringsData)を利用し、3Dオブジェクトを初期化及び描画を行います。
-   * 
-   * この関数の実行時、現在表示されている3Dデータが全削除されることに留意してください。
-   * 
-   * @returns void
-   */
-
-  function initializeRingDraw(): void {
-    dispatch(resetHandle()); // 全3Dを消去する
-  
-    const extractedRingData: RingData[] = getLatestLap(ringsData);
-    extractedRingData.forEach((value) => {
-      const newTorus: TorusInfo = convertToTorus(value);
-      dispatch(pushTorusInfo(newTorus));
-    });
-  };
-
 
   /**
    * 最終更新日時の情報をString型でreduxのstoreへ送ります。
