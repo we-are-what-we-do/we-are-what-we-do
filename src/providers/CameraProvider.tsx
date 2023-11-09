@@ -127,7 +127,7 @@ export function CameraProvider({children}: {children: ReactNode}){
         let nextFacing: "out" | "in" = (cameraFacing === "out") ? "in" : "out"; // 切り替え先のカメラの向き
 
         // 直前のストリームを停止する
-        freeUpStream(currentStream);
+        await freeUpStream(currentStream);
 
         // カメラを切り替える
         stream = await accessCamera(nextFacing); // もう一方のカメラに接続を試みる
@@ -139,7 +139,7 @@ export function CameraProvider({children}: {children: ReactNode}){
             setCameraFacing(nextFacing);
         }else{
             console.error("カメラを切り替えられませんでした");
-            showErrorToast("E099"); // 「システムエラー」というメッセージボックスを表示する
+            showErrorToast("E006"); // 「カメラの切り替えに失敗しました」というメッセージボックスを表示する
         };
     }
 
@@ -177,9 +177,9 @@ export function CameraProvider({children}: {children: ReactNode}){
     }
 
     // streamを停止する関数
-    function freeUpStream(stream: MediaStream | null): void{
+    async function freeUpStream(stream: MediaStream | null): Promise<void>{
         if(!stream) return;
-        stream.getVideoTracks().forEach((camera) => {
+        await stream.getVideoTracks().forEach((camera) => {
             camera.stop();
         });
     }
