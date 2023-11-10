@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo, useState, Fragment } from "react";
 import { GpsContext } from "../providers/GpsProvider";
 import { haversineDistance } from "../api/distanceCalculations";
 
@@ -38,7 +38,7 @@ export default function TestLocations(){
                 radius
             }
         });
-    }, []);
+    }, [geoJson, currentLatitude, currentLongitude]);
 
     return (
         <div
@@ -55,13 +55,13 @@ export default function TestLocations(){
                     position: "relative"
                 }}
             >
-                ロケーション状態{!showTestLocations && "非"}表示
+                ロケーション状態{showTestLocations && "非"}表示
             </button>
             <div
                 hidden={!showTestLocations}
             >
-                {locationState.map(state => (
-                    <>
+                {locationState.map((state, index) => (
+                    <Fragment key={index}>
                     <span
                         style={{
                             color: (state.distance <= state.radius) ? "blue" : "red"
@@ -70,7 +70,7 @@ export default function TestLocations(){
                         {state.jpName.substring(0, 5)}: {(Math.floor(state.distance * 10)) / 10} / {state.radius}
                     </span>
                     <br/>
-                    </>
+                    </Fragment>
                 ))}
             </div>
         </div>
