@@ -100,7 +100,7 @@ export function SocketProvider({children}: {children: ReactNode}){
         // websocket接続切断時のイベントハンドラ関数
         function onClose(){
             console.log("websocket接続がタイムアウトしました");
-            showTestToast(["サーバーとの接続が切断されました。画面を再度読み込み（リロード）してください。"], false); // TODO 本番ページでは表示しない
+            showErrorToast("E008"); //「サーバーとの接続が切断されました。」
         }
 
         // websocketインスタンスにイベントハンドラを登録する
