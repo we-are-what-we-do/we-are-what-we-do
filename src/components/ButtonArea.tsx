@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { postImageData, postRingData } from './../api/fetchDb';
 import { RingData } from "../handleRingData";
 import { CaptureContext } from "./../providers/CaptureProvider";
 import { CameraContext } from "./../providers/CameraProvider";
@@ -21,7 +20,7 @@ import { ICON_SIZE, ICON_COLOR, DISABLED_COLOR, BUTTON_MARGIN } from "./../App";
 import { useDispatch } from "react-redux";
 import { AppDispatch, useAppSelector } from "../redux/store";
 import { changeButtonState } from "../redux/features/buttonState-slice";
-import { ImageData } from "../types";
+import { SettingsContent } from "../providers/SettingsProvider";
 
 
 // ボタン類のコンポーネント
@@ -30,19 +29,16 @@ export default function ButtonArea(props: {
     isTakingPhoto: React.MutableRefObject<boolean>;
     initializePositionZ(): void;
     orbitControlsReset(): void;
+    testAddRing(): void;
 }) {
     /* useState等 */
     const {
         theme,
         isTakingPhoto,
         initializePositionZ,
-        orbitControlsReset
+        orbitControlsReset,
+        testAddRing
     } = props;
-
-    // サーバーからリングデータを取得するためのcontext
-    const {
-        setLatestRing
-    } = useContext(DbContext);
 
     // IPの状態を管理するcontext
     const {
@@ -72,7 +68,8 @@ export default function ButtonArea(props: {
 
     // 写真撮影(リング+カメラ)のためのcontext
     const {
-        captureImage
+        captureImage,
+        saveImage
     } = useContext(CaptureContext);
 
     // websocketを管理するcontext
@@ -83,6 +80,11 @@ export default function ButtonArea(props: {
         base64Ref,
 
     } = useContext(SocketContext);
+
+    // 設定を管理するcontext
+    const {
+        isTrialPage
+    } = useContext(SettingsContent);
 
     // 画面幅がmd以上かどうか
     const isMdScreen = useMediaQuery(() => theme.breakpoints.up("md")); // md以上
@@ -103,10 +105,10 @@ export default function ButtonArea(props: {
 
         isTakingPhoto.current = true; // 撮影ボタンの処理中であることを記録する
 
-        if(!gpsFlag){
+        if(!isTrialPage && !gpsFlag){
             // 現在地がピンの範囲外なら、処理をやめる
             showWarnToast("I001"); // 「ARリングはピン設置箇所の近くでのみ表示されます。」というメッセージボックスを表示する
-        }else if((!userFlag) || (hasPostRing.current)){
+        }else if(!isTrialPage && ((!userFlag) || (hasPostRing.current))){
             // 連続撮影orリングを送信済みなら、処理を止める
             showWarnToast("I002"); // 「連続撮影はできません。」というメッセージボックスを表示する
         }else{
@@ -121,38 +123,24 @@ export default function ButtonArea(props: {
 
             // 撮影した写真に承諾が取れたら、サーバーにリングを送信する
             if(isPhotoOk){
-                // 描画に追加したリングのデータを取得する
-                const addedRingData: RingData | null = getRingDataToAdd();
+                if(isTrialPage){
+                    // 連続撮影できるようリングデータを送信する
+                    testAddRing();
 
-                // 写真(リング+カメラ)を撮影をして、base64形式で取得する
-                const newImage: string | null = captureImage();
+                    // 「ARリングの生成に成功しました。」というメッセージボックスを表示する
+                    showSuccessToast("I005");
 
-                // エラーハンドリング
-                try{
-                    if(!addedRingData){
-                        throw new Error("追加したリングデータを取得できませんでした");
-                    };
-                    if(!newImage){
-                        throw new Error("写真を撮影できませんでした");
-                    }
-                }catch(error){
-                    console.error(error);
-                    videoRef.current?.play(); // カメラを再生する
-                    dispatch(changeButtonState()); // 3Dの視点固定を解除する
-                    isTakingPhoto.current = false; // 撮影ボタンの処理が終わったことを記録する
-                    showErrorToast("E004"); // 「"撮影画像のアップロードに失敗しました。」というメッセージを表示する
-                    return;
+                    // 撮影した写真をダウンロードする
+                    const newImage: string | null = captureImage(); // 写真(リング+カメラ)を撮影をして、base64形式で取得する
+                    if(!newImage) throw new Error("写真を撮影できませんでした");
+                    saveImage(newImage); // 取得した写真をダウンロードする
+                }else{
+                    // websocketでリングデータを送信し、画像データ送信を待機する
+                    sendRingData();
                 }
-
-                // リングデータを送信する
-                socketRef.current?.send(JSON.stringify(addedRingData));
-                console.log("サーバーにデータを送信しました:\n", addedRingData);
-
-                // 画像データを送信待機用refに保存する(レスポンスを受け取ったら送信する予定)
-                base64Ref.current = newImage;
             }else{
                 // 再撮影を望む場合、処理を止める
-                // console.log("撮影やり直しのために処理を中断しました");
+                console.log("撮影やり直しのために処理を中断しました");
             }
 
             videoRef.current?.play(); // カメラを再生する
@@ -160,6 +148,39 @@ export default function ButtonArea(props: {
         }
 
         isTakingPhoto.current = false; // 撮影ボタンの処理が終わったことを記録する
+    }
+
+    // websocketでリングデータを送信し、画像データ送信を待機する関数
+    function sendRingData(): void{
+        // 描画に追加したリングのデータを取得する
+        const addedRingData: RingData | null = getRingDataToAdd();
+
+        // 写真(リング+カメラ)を撮影をして、base64形式で取得する
+        const newImage: string | null = captureImage();
+
+        // エラーハンドリング
+        try{
+            if(!addedRingData){
+                throw new Error("追加したリングデータを取得できませんでした");
+            };
+            if(!newImage){
+                throw new Error("写真を撮影できませんでした");
+            }
+        }catch(error){
+            console.error(error);
+            videoRef.current?.play(); // カメラを再生する
+            dispatch(changeButtonState()); // 3Dの視点固定を解除する
+            isTakingPhoto.current = false; // 撮影ボタンの処理が終わったことを記録する
+            showErrorToast("E004"); // 「"撮影画像のアップロードに失敗しました。」というメッセージを表示する
+            return;
+        }
+
+        // リングデータを送信する
+        socketRef.current?.send(JSON.stringify(addedRingData));
+        console.log("サーバーにデータを送信しました:\n", addedRingData);
+
+        // 画像データを送信待機用refに保存する(レスポンスを受け取ったら送信する予定)
+        base64Ref.current = newImage;
     }
 
 
