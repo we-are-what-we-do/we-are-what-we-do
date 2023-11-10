@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
-import { clientId, WS_URL } from '../constants';
+import { clientId, TEST_WS_URL, WS_URL } from '../constants';
 import { DbContext } from './DbProvider';
 import { convertToTorus, RingData } from '../handleRingData';
 import { ImageData } from '../types';
@@ -11,6 +11,7 @@ import { initializeTorus, pushTorusInfo, replaceTorus, resetHandle, TorusInfo } 
 import { useDispatch } from 'react-redux';
 import { AppDispatch, useAppSelector } from '../redux/store';
 import { CaptureContext } from './CaptureProvider';
+import { SettingsContent } from './SettingsProvider';
 
 // リングデータがコンフリクトした際のエラーレスポンスのメッセージ
 const CONFLICT_INDEX_MESSAGE: string = "conflict_ring: Conflict in, `ring`. `Index` should be Unique within a defined value.";
@@ -71,6 +72,11 @@ export function SocketProvider({children}: {children: ReactNode}){
         saveImage
     } = useContext(CaptureContext);
 
+    // 設定を管理するcontext
+    const {
+        isTrialPage
+    } = useContext(SettingsContent);
+
     // reduxのdispatch
     const dispatch = useDispatch<AppDispatch>();
     const torusList = useAppSelector((state) => state.torusInfo.value); // 描画に追加されているリングデータ
@@ -80,7 +86,8 @@ export function SocketProvider({children}: {children: ReactNode}){
     // WebSocket関連の処理は副作用なので、useEffect内で実装
     useEffect(() => {
         // WebSocketオブジェクトを生成しサーバとの接続を開始
-        const websocket = new WebSocket(WS_URL);
+        const wsUrl: string = isTrialPage ? TEST_WS_URL : WS_URL;
+        const websocket = new WebSocket(wsUrl);
         console.log("websocket:", websocket);
         socketRef.current = websocket;
 
@@ -97,6 +104,7 @@ export function SocketProvider({children}: {children: ReactNode}){
         return () => {
             websocket.close();
             websocket.removeEventListener('message', onMessage);
+            console.log("websocket接続が切れました");
         }
     }, [])
 
@@ -271,6 +279,10 @@ export function SocketProvider({children}: {children: ReactNode}){
 
     // 自分が送信元のリングデータを受け取った際に、撮影処理でrefに一旦保持した画像データを送信する関数
     async function handleOwnRing(ownRingData: RingData): Promise<void>{
+        if(isTrialPage){
+            console.error("体験版ページは他人名義でリングを送信する設計なのに、自分名義のリングを受信しました");
+            return;
+        }
         if(!base64Ref.current) return;
         if(!(ownRingData.id && ownRingData.created_at)){
             console.error("自分が送信したリングデータを受け取りましたが、`id`や`created_at`が設定されていなかったので画像データを送信できませんでした", ownRingData);
@@ -286,7 +298,7 @@ export function SocketProvider({children}: {children: ReactNode}){
 
         try{
             // base64形式の画像をサーバーに送信する
-            await postImageData(imageData);
+            await postImageData(isTrialPage, imageData);
 
             // 「ARリングの生成に成功しました。」というメッセージボックスを表示する
             showSuccessToast("I005");

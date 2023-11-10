@@ -15,6 +15,10 @@ import { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useAppSelector } from "./redux/store";
 import { SocketContext } from "./providers/SocketProvider";
 import TestButtons from "./components/TestButtons";
+import { RingData } from "./handleRingData";
+import { v4 as uuidv4 } from 'uuid';
+import { DbContext } from "./providers/DbProvider";
+import { RingContext } from "./providers/RingProvider";
 
 
 /* 定数定義 */
@@ -46,6 +50,11 @@ const theme = createTheme({
 
 export default function App() {
   /* stateやcontext等 */
+  // サーバーから取得したリングデータを管理するcontext
+  const {
+    setLatestRing
+  } = useContext(DbContext);
+
   // 写真撮影(リング+カメラ)のためのcontext
   const {
     canvasRef
@@ -59,8 +68,15 @@ export default function App() {
 
   // websocketを管理するcontext
   const {
-    isLoadedData
+    isLoadedData,
+    socketRef
   } = useContext(SocketContext);
+
+  // リングのデータを追加するためのcontext
+  const {
+    getRingDataToAdd,
+    addedTorus
+  } = useContext(RingContext);
 
   // 撮影ボタンの処理中かどうか
   const isTakingPhoto = useRef<boolean>(false);
@@ -111,6 +127,29 @@ export default function App() {
   }
 
 
+  // サーバーにリングを追加する処理(テスト用)
+  async function testAddRing(): Promise<void>{
+    let addedRingData: RingData | null = null;
+    const testUser: string = uuidv4();
+    console.log("testUser:", testUser)
+
+    // 既に描画に追加したリングのデータを送信する
+    addedRingData = getRingDataToAdd(addedTorus?.torusData, testUser);
+    if(!addedRingData){
+        console.error("追加したリングデータを取得できませんでした");
+        return;
+    };
+    addedRingData.user = testUser;
+
+    // 他人名義でサーバーにリングデータを送信する
+    socketRef.current?.send(JSON.stringify(addedRingData));
+    console.log("サーバーにデータを送信しました:\n", addedRingData);
+
+    // state更新
+    setLatestRing(addedRingData);
+  }
+
+
   return(
     <> 
       <div id="app">
@@ -154,13 +193,14 @@ export default function App() {
           )}
         </div>
       </div>
-      {/* <TestButtons/> */}{/* TODO テスト用ボタンは本番では表示しない */}
+      {/* <TestButtons testAddRing={testAddRing}/> */}{/* TODO テスト用ボタンは本番では表示しない */}
       <ThemeProvider theme={theme}>
         <ButtonArea
           theme={theme}
           isTakingPhoto={isTakingPhoto}
           initializePositionZ={() => initializePositionZ(window.innerWidth)}
           orbitControlsReset={orbitControlsReset}
+          testAddRing={testAddRing}
         />
       </ThemeProvider>
       <ToastContainer />

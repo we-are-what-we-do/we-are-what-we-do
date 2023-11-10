@@ -1,9 +1,10 @@
-import { createContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from 'geojson';
 import { getLocationConfig } from '../api/fetchDb';
 import { haversineDistance } from '../api/distanceCalculations';
 import { showErrorToast, showInfoToast, showTestToast, showWarnToast } from '../components/ToastHelpers';
 import { TEST_LOCATION_ID } from '../constants';
+import { SettingsContent } from './SettingsProvider';
 
 
 /* 定数定義 */
@@ -38,6 +39,11 @@ export const GpsContext = createContext<Context>(initialData);
 // GPSの状態を管理するプロバイダー
 export function GpsProvider({children}: {children: ReactNode}){
     /* useState, useContext等 */
+    // 設定を管理するcontext
+    const {
+        isTrialPage
+    } = useContext(SettingsContent);
+
     const [gpsFlag, setGpsFlag] = useState<boolean>(false); // 現在地がピンの範囲内かどうかのフラグ
 
     // リングデータをサーバーに送信する際に必要なGPS情報を管理するstate
@@ -52,48 +58,58 @@ export function GpsProvider({children}: {children: ReactNode}){
     /* useEffect等 */
     // 初回レンダリング時、GeoJSON Pointデータを取得し、現在地がピンの範囲内かどうかを調べる
     useEffect(() => {
-        // ピン設定データを取得する
-        try{
-            getLocationConfig().then(data => {
-                setGeoJsonData(data);
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        console.log("GPS done")
-                        // 位置情報が変更されたときに呼び出されるコールバック
-                        handleChangePosition(position, data, true).then(() => {
-                            setIsLoadedGps(true);
-                            console.log("isLoadedGps is OK");
-                        });
-                    },
-                    (error) => {
-                        console.log("GPS error")
-                        showErrorToast("E002");
-                    },
-                    { enableHighAccuracy: true } // 高い精度を要求
-                );
-            });
-        }catch(error){
-            console.error("Error fetching GeoJSON Point data.", error);
+        if(isTrialPage){
+            setLocation(TEST_LOCATION_ID); // ロケーションIDを保存する
+            setGpsFlag(true); // 現在地がピンの範囲内かどうかを保存する
+            setCurrentLatitude(0); // 現在地の緯度を保存する
+            setCurrentLongitude(0);// 現在地の経度を保存する
+            setIsLoadedGps(true);
+        }else{
+            // ピン設定データを取得する
+            try{
+                getLocationConfig(isTrialPage).then(data => {
+                    setGeoJsonData(data);
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            console.log("GPS done")
+                            // 位置情報が変更されたときに呼び出されるコールバック
+                            handleChangePosition(position, data, true).then(() => {
+                                setIsLoadedGps(true);
+                                console.log("isLoadedGps is OK");
+                            });
+                        },
+                        (error) => {
+                            console.log("GPS error")
+                            showErrorToast("E002");
+                        },
+                        { enableHighAccuracy: true } // 高い精度を要求
+                    );
+                });
+            }catch(error){
+                console.error("Error fetching GeoJSON Point data.", error);
+            }
         }
     }, []);
 
     // ユーザーの位置情報を監視し、現在地がピンの範囲内かどうかを調べる
     useEffect(() => {
-        const watchId = navigator.geolocation.watchPosition(
-            (position) => {
-                // 位置情報が変更されたときに呼び出されるコールバック
-                handleChangePosition(position, geoJsonData, false);
-            },
-            (error) => {
-                console.error(`Watching GPS Error:`, error);
-            },
-            { enableHighAccuracy: true } // 高い精度を要求
-        );
+        if(!isTrialPage){
+            const watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    // 位置情報が変更されたときに呼び出されるコールバック
+                    handleChangePosition(position, geoJsonData, false);
+                },
+                (error) => {
+                    console.error(`Watching GPS Error:`, error);
+                },
+                { enableHighAccuracy: true } // 高い精度を要求
+            );
 
-        // コンポーネントがアンマウントされたときに監視を停止
-        return () => {
-            navigator.geolocation.clearWatch(watchId);
-        };
+            // コンポーネントがアンマウントされたときに監視を停止
+            return () => {
+                navigator.geolocation.clearWatch(watchId);
+            };
+        }
     }, []);
 
 

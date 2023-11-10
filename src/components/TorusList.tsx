@@ -3,6 +3,7 @@ import { useAppSelector } from "../redux/store";
 import { RingContext } from "../providers/RingProvider";
 import { SocketContext } from "../providers/SocketProvider";
 import { useContext } from "react";
+import { SettingsContent } from "../providers/SettingsProvider";
 
 const TRANSPARENCY: number = 0.5; // 半透明リングの透明度
 
@@ -16,6 +17,10 @@ function TorusList({isTakingPhoto}: {isTakingPhoto: React.MutableRefObject<boole
   const {
     hasPostRing
   } = useContext(SocketContext);
+
+  const {
+    isTrialPage
+  } = useContext(SettingsContent);
 
   // リングの透明度を取得する関数
   function getTransparency(torusId: string): number{
@@ -45,7 +50,7 @@ function TorusList({isTakingPhoto}: {isTakingPhoto: React.MutableRefObject<boole
         >
           <torusGeometry args={[5.5, 1.5, 40, 50]} />
           <meshStandardMaterial
-            color={torus.color}
+            color={isTrialPage ? "rgb(255, 255, 255)" : torus.color}
             roughness={0.0}
             transparent={true}
             opacity={getTransparency(torus.id)}
