@@ -26,7 +26,7 @@ async function makeGetRequest(isTrialPage: boolean, apiEndpoint: string, queryPa
 }
 
 // ピンの全設定データを取得する関数
-export async function getLocationConfig(isTrialPage: boolean): Promise<FeatureCollection<Point>>{
+export async function getLocationConfig(isTrialPage: boolean = false): Promise<FeatureCollection<Point>>{
     let result: FeatureCollection<Point> | null = null;
     // キャッシュデータからのピン設定データ取得を試みる
     const cashData: string | null = localStorage.getItem("locations");
@@ -51,7 +51,7 @@ export async function getLocationConfig(isTrialPage: boolean): Promise<FeatureCo
 }
 
 // ピン一か所から、リングのデータを取得する関数
-export async function getRingData(isTrialPage: boolean): Promise<RingData[]>{
+export async function getRingData(isTrialPage: boolean = false): Promise<RingData[]>{
     const apiEndpoint: string = "rings";
 
     // インスタンス一覧を取得する
