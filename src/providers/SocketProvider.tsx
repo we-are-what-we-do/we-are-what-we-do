@@ -4,7 +4,7 @@ import { DbContext } from './DbProvider';
 import { convertToTorus, RingData } from '../handleRingData';
 import { ImageData } from '../types';
 import { postImageData } from '../api/fetchDb';
-import { showErrorToast, showSuccessToast, showWarnToast } from '../components/ToastHelpers';
+import { showErrorToast, showSuccessToast, showTestToast, showWarnToast } from '../components/ToastHelpers';
 import { RingContext } from './RingProvider';
 import { positionArray } from '../torusPosition';
 import { initializeTorus, pushTorusInfo, replaceTorus, resetHandle, TorusInfo } from '../redux/features/torusInfo-slice';
@@ -97,8 +97,15 @@ export function SocketProvider({children}: {children: ReactNode}){
             setWsEvent(event);
         }
 
+        // websocket接続切断時のイベントハンドラ関数
+        function onClose(){
+            console.log("websocket接続がタイムアウトしました");
+            showTestToast(["サーバーとの接続が切断されました。画面を再度読み込み（リロード）してください。"], false); // TODO 本番ページでは表示しない
+        }
+
         // websocketインスタンスにイベントハンドラを登録する
         websocket.addEventListener("message", onMessage);
+        websocket.addEventListener("close", onClose);
 
         // useEffectのクリーンアップの中で、WebSocketのクローズ処理を実行
         return () => {

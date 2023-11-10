@@ -19,6 +19,7 @@ import { RingData } from "./handleRingData";
 import { v4 as uuidv4 } from 'uuid';
 import { DbContext } from "./providers/DbProvider";
 import { RingContext } from "./providers/RingProvider";
+import TestLocations from "./components/TestLocations";
 
 
 /* 定数定義 */
@@ -194,6 +195,7 @@ export default function App() {
         </div>
       </div>
       <TestButtons testAddRing={testAddRing}/>{/* TODO テスト用ボタンは本番では表示しない */}
+      <TestLocations/>{/* TODO テスト用ロケーション表示は本番では表示しない */}
       <ThemeProvider theme={theme}>
         <ButtonArea
           theme={theme}
