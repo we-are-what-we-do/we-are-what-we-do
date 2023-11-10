@@ -69,7 +69,7 @@ export function GpsProvider({children}: {children: ReactNode}){
                 (position) => {
                     console.log("GPS changed")
                     // 位置情報が変更されたときに呼び出されるコールバック
-                    handleChangePosition(position, isLoadedGps);
+                    handleChangePosition(position, !isLoadedGps);
                 },
                 (error) => {
                     console.error(`Watching GPS Error:`, error);
@@ -204,6 +204,7 @@ export function GpsProvider({children}: {children: ReactNode}){
             longitude
         } = settings;
 
+        console.log({isDo})
         if(!isDo) return; // 実行しない場合、実行しない
 
         console.log(`${feature.properties?.localize.jp}: ${distance} / ${radius}`, "\n", {currentLat, currentLon, latitude, longitude});
