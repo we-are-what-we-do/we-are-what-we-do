@@ -7,6 +7,7 @@ import { positionArray } from '../../torusPosition';
 import { pushTorusInfo, replaceTorus, resetHandle, TorusInfo } from '../../redux/features/torusInfo-slice';
 import { useDispatch } from 'react-redux';
 import { AppDispatch, useAppSelector } from '../../redux/store';
+import { getRingData } from '../../api/fetchDb';
 
 
 /* 型定義 */
@@ -116,11 +117,17 @@ export function SocketProvider({children}: {children: ReactNode}){
     }
 
     // websocket接続時に最新リングデータインスタンスを取得し、画面リング描画を初期化する関数
-    function handleOnConnect(data: any){
-        const ringsData: RingData[] = data.rings; // リングデータの配列(0～70個)
+    async function handleOnConnect(data: any): Promise<void>{
+        let ringsData: RingData[] = data.rings; // リングデータの配列(0～70個)
         if(ringsData.length > positionArray.length){
             console.error("受け取ったリングデータが70個より多いです");
             return;
+        }
+
+        console.log(ringsData.length)
+        // リングデータが70n個のとき、websocketで取得したデータがは0個になるので、RestApiでリングデータは取得する
+        if(ringsData.length <= 0){
+            ringsData = await getRingData(false, true);
         }
 
         // 取得したリングデータで画面リング描画を初期化する
