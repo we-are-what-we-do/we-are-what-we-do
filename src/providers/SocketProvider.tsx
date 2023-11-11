@@ -102,6 +102,7 @@ export function SocketProvider({children}: {children: ReactNode}){
         function onClose(){
             console.log("websocket接続がタイムアウトしました");
             showErrorToast("E008"); //「サーバーとの接続が切断されました。」
+            socketRef.current = null;
         }
 
         // websocketインスタンスにイベントハンドラを登録する
