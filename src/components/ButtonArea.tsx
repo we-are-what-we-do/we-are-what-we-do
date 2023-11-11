@@ -103,6 +103,12 @@ export default function ButtonArea(props: {
             return;
         };
 
+        // websocket接続ができていないなら、処理を中止する
+        if(socketRef.current === null){
+            showErrorToast("E008"); //「サーバーとの接続が切断されました。」
+            return;
+        }
+
         isTakingPhoto.current = true; // 撮影ボタンの処理中であることを記録する
 
         if(!isTrialPage && !gpsFlag){
