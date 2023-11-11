@@ -29,7 +29,8 @@ async function makeGetRequest(isTrialPage: boolean, apiEndpoint: string, queryPa
 export async function getLocationConfig(isTrialPage: boolean = false): Promise<FeatureCollection<Point>>{
     let result: FeatureCollection<Point> | null = null;
     // キャッシュデータからのピン設定データ取得を試みる
-    const cashData: string | null = localStorage.getItem("locations");
+    // const cashData: string | null = localStorage.getItem("locations");
+    const cashData: string | null = null; // TODO eTagの実装が終わったら修正
     // localStorage.removeItem("locations"); // localStorageを削除したい際はこのコードで削除する
 
     if(cashData){
