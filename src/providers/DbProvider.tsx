@@ -1,8 +1,6 @@
 import { createContext, useState, ReactNode, useEffect } from 'react';
-import {
-    RingData,
-    getLatestRing
-} from "../handleRingData";
+import { getLatestRing } from "../handleRingData";
+import { RingData } from '../types';
 
 
 /* 型定義 */

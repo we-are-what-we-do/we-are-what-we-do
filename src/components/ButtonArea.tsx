@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { RingData } from "../handleRingData";
+import { RingData } from "../types";
 import { CaptureContext } from "./../providers/CaptureProvider";
 import { CameraContext } from "./../providers/CameraProvider";
 import { RingContext } from "./../providers/RingProvider";

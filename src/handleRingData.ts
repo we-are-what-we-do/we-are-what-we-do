@@ -1,25 +1,7 @@
 import { Ring, positionArray, torusScale } from "./torusPosition";
 import { TorusInfo } from "./redux/features/torusInfo-slice";
 import { v4 as uuidv4 } from 'uuid';
-
-
-/* 型定義 */
-// リングの型
-export type RingData = {
-    "id"?: string; // リングデータのID (UUID)
-    "pos_in"?: { // torusの座標
-        "x": number;
-        "y": number;
-    };
-    "location": string; // ロケーションピンのID (UUID)
-    "longitude": number; // 撮影地点の経度
-    "latitude": number; // 撮影地点の緯度
-    "indexed": number; // リング軌道内の順番 (DEI中の何個目か、0~69)
-    "hue": number; // リングの色調 (0～360)
-    "user": string; // ユーザーID (UUID)
-    "created_at": string; // 撮影日時 (ISO8601)
-    "nonce"?: string; // websocket送信者のID(UUID)
-};
+import { RingData } from "./types";
 
 
 /* 関数定義 */
