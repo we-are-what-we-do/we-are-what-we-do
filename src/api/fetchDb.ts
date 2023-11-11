@@ -1,5 +1,6 @@
 import { Point, FeatureCollection } from 'geojson';
-import { RingData, compareISO8601Dates } from "../handleRingData";
+import { compareISO8601Dates } from "../handleRingData";
+import { RingData } from "../types";
 import { ImageData, RingInstance } from '../types';
 import { API_URL, TEST_API_URL } from '../constants';
 
@@ -92,6 +93,26 @@ async function getLatestInstanceId(isTrialPage: boolean, apiEndpoint: string): P
     const latestInstanceId: string | null = latestInstance?.id ?? null; // 有効なインスタンスが一つもない場合は、nullを返す
 console.log({data, latestInstance})
     return latestInstanceId;
+}
+
+// 完成しているリングインスタンスの数を取得する関数
+export async function getFinishedInstancesCount(isTrialPage: boolean = false): Promise<number>{
+    const apiEndpoint: string = "rings";
+
+    // インスタンス一覧を取得する
+    let data: RingInstance[] = [];
+    try{
+        const response: Response = await makeGetRequest(isTrialPage, apiEndpoint);
+        data = await response.json();
+    }catch(error){
+        console.error(error);
+    }
+
+    const finishedInstances: RingInstance[] = data.filter((ringInstance) => {
+        if(ringInstance.finished_at) return ringInstance;
+    });
+
+    return finishedInstances.length;
 }
 
 // JSONのPOSTリクエストを行う共通関数

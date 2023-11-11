@@ -15,7 +15,7 @@ import { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useAppSelector } from "./redux/store";
 import { SocketContext } from "./providers/SocketProvider";
 import TestButtons from "./components/TestButtons";
-import { RingData } from "./handleRingData";
+import { RingData } from "./types";
 import { v4 as uuidv4 } from 'uuid';
 import { DbContext } from "./providers/DbProvider";
 import { RingContext } from "./providers/RingProvider";

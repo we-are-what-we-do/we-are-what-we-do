@@ -8,13 +8,13 @@ import { useContext, useEffect, useRef, useState } from "react";
 
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "./redux/store";
-import { TorusInfo, pushTorusInfo, resetHandle } from "./../redux/features/torusInfo-slice";
 import { getUpdateTime } from "./redux/features/updateTime-slice";
-import { RingData, convertToTorus } from "./../handleRingData";
 
 import { DbContext } from "./../providers/DbProvider";
 import { FeatureCollection, Point } from "geojson";
-import { getLocationConfig, getLocationJp, getRingData } from "../api/fetchDb";
+import { getFinishedInstancesCount, getLocationConfig, getLocationJp, getRingData } from "../api/fetchDb";
+import { SocketContext } from "./providers/SocketProvider";
+import { positionArray } from "../torusPosition";
 
 
 function App() {
@@ -25,13 +25,22 @@ function App() {
 
   // データ更新時、全データを取得し、リング数を取得する
   const [ringCount, setRingCount] = useState<number>(0);
+  const { currentRingCount } = useContext(SocketContext);
+  const [finishedInstancesCount, setFinishedInstancesCount] = useState<number>(0);
 
+  // 現在DEIが何周完成したかを取得する
   useEffect(() => {
-      getRingData().then((ringsData) => {
-          const newRingCount: number = Object.keys(ringsData).length;
-          setRingCount(newRingCount);
+      getFinishedInstancesCount().then((count) => {
+          setFinishedInstancesCount(count);
       })
   }, []);
+
+  // リング総数の更新を行う
+  useEffect(() => {
+    const deiLength: number = positionArray.length;
+    const newRingCount: number = finishedInstancesCount * deiLength + currentRingCount;
+    setRingCount(newRingCount);
+  }, [finishedInstancesCount, currentRingCount])
 
 
   // 最終更新日の表示を行う
@@ -60,19 +69,6 @@ function App() {
     const newLatestLocationJp: string | null = getLocationJp(geoData, latestRing.location);
     setLatestLocationJp(newLatestLocationJp);
   }, [latestRing]);
-
-
-  // 一定時間おきにサーバーからデータを取得し、リング表示を初期化する
-  useEffect(() => {
-    // initializeRingData();
-    const intervalTime: number = 1000 * 60 * 1; // 1分置きに更新する
-
-    const intervalFunc = setInterval(() => {
-      // initializeRingData();
-        // console.log("リングデータを更新しました");
-    }, intervalTime);
-    return () => clearInterval(intervalFunc);
-  }, []);
 
   /**
    * 最終更新日時の情報をString型でreduxのstoreへ送ります。

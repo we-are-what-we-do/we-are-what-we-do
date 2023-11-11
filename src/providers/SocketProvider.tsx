@@ -1,7 +1,8 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { clientId, TEST_WS_URL, WS_URL } from '../constants';
 import { DbContext } from './DbProvider';
-import { convertToTorus, RingData } from '../handleRingData';
+import { convertToTorus } from '../handleRingData';
+import { RingData } from '../types';
 import { ImageData } from '../types';
 import { postImageData } from '../api/fetchDb';
 import { showErrorToast, showSuccessToast, showTestToast, showWarnToast } from '../components/ToastHelpers';
