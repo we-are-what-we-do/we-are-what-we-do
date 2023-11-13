@@ -113,6 +113,7 @@ export function GpsProvider({children}: {children: ReactNode}){
     async function handleChangePosition(position: GeolocationPosition): Promise<void>{
         // ピン設定データを取得する
         let geoJsonData: FeatureCollection<Point> | null = null;
+        console.log({locationsData})
         if(!locationsData){
             const newGeoJsonData: FeatureCollection<Point> | null = await getLocationConfig();
             geoJsonData = newGeoJsonData;
@@ -126,6 +127,7 @@ export function GpsProvider({children}: {children: ReactNode}){
         setCurrentPositions(position);
 
         // 現在地の取得とピンの位置を比較する
+        console.log({geoJsonData})
         if(!geoJsonData) return;
         const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData) ?? TEST_LOCATION_ID; // TODO テスト用ロケーションIDを使用しないよう修正
 
