@@ -13,6 +13,9 @@ import { SettingsContent } from './SettingsProvider';
 // const RADIUS = process.env.REACT_APP_RADIUS ? parseInt(process.env.REACT_APP_RADIUS) : 100;
 const RADIUS = 100;
 
+// ロケーションデータをreact外で管理する
+let locationsData: FeatureCollection<Point> | null = null;
+
 
 /* 型定義 */
 // contextに渡すデータの型
@@ -110,9 +113,11 @@ export function GpsProvider({children}: {children: ReactNode}){
     async function handleChangePosition(position: GeolocationPosition): Promise<void>{
         // ピン設定データを取得する
         let geoJsonData: FeatureCollection<Point> | null = null;
-        if(!geoJson){
-            geoJsonData = await getLocationConfig();
-            setGeoJson(geoJsonData);
+        if(!locationsData){
+            const newGeoJsonData: FeatureCollection<Point> | null = await getLocationConfig();
+            geoJsonData = newGeoJsonData;
+            setGeoJson(newGeoJsonData);
+            locationsData = geoJsonData; // watchPosition()にはstateやrefを使えないため、react外で管理する
         }else{
             geoJsonData = geoJson;
         }
@@ -121,7 +126,8 @@ export function GpsProvider({children}: {children: ReactNode}){
         setCurrentPositions(position);
 
         // 現在地の取得とピンの位置を比較する
-        const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData)/*  ?? TEST_LOCATION_ID */; // TODO テスト用ロケーションIDを使用しないよう修正
+        if(!geoJsonData) return;
+        const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData)/*  ?? TEST_LOCATION_ID; */ // TODO テスト用ロケーションIDを使用しないよう修正
 
         // 比較した結果をstateに保存する
         setLocation(locationId); // ロケーションIDを保存する
