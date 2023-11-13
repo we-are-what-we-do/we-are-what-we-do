@@ -23,6 +23,8 @@ function PicList({updatePhotoCount}: PicListProps) {
           key={index} 
           src={`${baseUrl}${picPath}`} 
           alt={`pic-${index}`}
+          loading="lazy"
+          decoding="async"
           className="picListItem"/>
       ))}
     </div>
