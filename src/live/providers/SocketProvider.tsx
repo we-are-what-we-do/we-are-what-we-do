@@ -124,7 +124,9 @@ export function SocketProvider({children}: {children: ReactNode}){
             return;
         }
 
-        console.log(ringsData.length)
+        // 最新インスタンスのリング数を取得する
+        const ringCount: number = ringsData.length;
+
         // リングデータが70n個のとき、websocketで取得したデータがは0個になるので、RestApiでリングデータは取得する
         if(ringsData.length <= 0){
             ringsData = await getRingData(false, true);
@@ -133,7 +135,7 @@ export function SocketProvider({children}: {children: ReactNode}){
         // 取得したリングデータで画面リング描画を初期化する
         initializeLatestRing(ringsData); // 最新リングを更新する
         initializeRingDraw(ringsData); // 画面リング描画を初期化する
-        setCurrentRingCount(ringsData.length); // リング数を初期化する
+        setCurrentRingCount(ringCount); // リング数を初期化する
 
         // リングデータの読み込みが終わったことを周知させる
         setIsLoadedData(true);

@@ -7,12 +7,22 @@ import { API_URL, TEST_API_URL } from '../constants';
 
 /* 関数定義 */
 // GETリクエストを行う共通関数
-async function makeGetRequest(isTrialPage: boolean, apiEndpoint: string, queryParams?: string): Promise<Response>{
+async function makeGetRequest(isTrialPage: boolean, apiEndpoint: string, queryParams?: string, etag?: string | null): Promise<Response>{
     const apiUrl: string = isTrialPage ? TEST_API_URL : API_URL;
     try {
-        const url: string = apiUrl + apiEndpoint + (queryParams ?? '');
+        const url: string = apiUrl + apiEndpoint + (queryParams ?? "");
         console.log({url})
-        const response = await fetch(url);
+
+        // etag利用のためのヘッダーを作成する
+        const headers: HeadersInit | undefined = etag ? { "If-None-Match": etag } : undefined;
+
+        // サーバーにGETリクエストを行う
+        const response = await fetch(url, {
+            method: "GET",
+            headers
+        });
+
+        // レスポンスをハンドリングする
         if(response.ok){
             return response;
         }else{
@@ -29,26 +39,20 @@ async function makeGetRequest(isTrialPage: boolean, apiEndpoint: string, queryPa
 // ピンの全設定データを取得する関数
 export async function getLocationConfig(isTrialPage: boolean = false): Promise<FeatureCollection<Point>>{
     let result: FeatureCollection<Point> | null = null;
-    // キャッシュデータからのピン設定データ取得を試みる
-    // const cashData: string | null = localStorage.getItem("locations");
-    const cashData: string | null = null; // TODO eTagの実装が終わったら修正
-    // localStorage.removeItem("locations"); // localStorageを削除したい際はこのコードで削除する
 
-    if(cashData){
-        const locationData = JSON.parse(cashData) as FeatureCollection<Point>;
-        result = locationData;
-        console.log("キャッシュからgeolocationデータを読み込みました", locationData);
-    }else{
-        // キャッシュデータがない場合、サーバーからデータを取得する
-        const apiEndpoint: string = "locations";
-        const response: Response = await makeGetRequest(isTrialPage, apiEndpoint);
-        result = await response.json() as FeatureCollection<Point>;
-        console.log("location: ", result);
+    // 前回のETagをLocalStorageから取得
+    const previousETag = localStorage.getItem("ETag") || null;
 
-        // サーバーから取得したデータをキャッシュに保存する
-        localStorage.setItem("locations", JSON.stringify(result));
-        // console.log("キャッシュにgeolocationデータを保存しました", result);
-    }
+    // ピンの全設定データを取得する
+    const apiEndpoint: string = "locations";
+    const response: Response = await makeGetRequest(isTrialPage, apiEndpoint, "", previousETag);
+    result = await response.json() as FeatureCollection<Point>;
+    console.log("location: ", result);
+
+    // ETagを保存しておく
+    const etag: string = response.headers.get("ETag") || "";
+    localStorage.setItem("ETag", etag);
+
     return result;
 }
 
