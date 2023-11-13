@@ -189,6 +189,7 @@ export function GpsProvider({children}: {children: ReactNode}){
         if(isInLocation){
             // GPSがピンの範囲内の場合、「ARリングを増やしましょう。」というメッセージボックスを表示する
             showInfoToast("I003");
+            if(isTrialPage) showInfoToast("I006");
         }else{
             // GPSがピンの範囲外の場合、「ARリングはピン設置箇所の近くでのみ表示されます。」というメッセージボックスを表示する
             showWarnToast("I001");
