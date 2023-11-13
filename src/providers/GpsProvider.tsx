@@ -186,6 +186,7 @@ export function GpsProvider({children}: {children: ReactNode}){
 
     // 初回ページ読み込み時にメッセージを表示する関数
     function showWelcomeMessage(isInLocation: boolean){
+        if(isTrialPage) showInfoToast("I006");
         if(isInLocation){
             // GPSがピンの範囲内の場合、「ARリングを増やしましょう。」というメッセージボックスを表示する
             showInfoToast("I003");
