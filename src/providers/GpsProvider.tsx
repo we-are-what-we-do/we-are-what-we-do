@@ -119,15 +119,14 @@ export function GpsProvider({children}: {children: ReactNode}){
             setGeoJson(newGeoJsonData);
             locationsData = geoJsonData; // watchPosition()にはstateやrefを使えないため、react外で管理する
         }else{
-            geoJsonData = geoJson;
+            geoJsonData = locationsData;
         }
 
         // 現在地の緯度・経度をstateに保存する
         setCurrentPositions(position);
 
         // 現在地の取得とピンの位置を比較する
-        if(!geoJsonData) return;
-        const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData)/*  ?? TEST_LOCATION_ID; */ // TODO テスト用ロケーションIDを使用しないよう修正
+        const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData)/*  ?? TEST_LOCATION_ID */; // TODO テスト用ロケーションIDを使用しないよう修正
 
         // 比較した結果をstateに保存する
         setLocation(locationId); // ロケーションIDを保存する
