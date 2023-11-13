@@ -104,7 +104,8 @@ export default function ButtonArea(props: {
         };
 
         // websocket接続ができていないなら、処理を中止する
-        if(socketRef.current === null){
+        console.log({readyState: socketRef.current?.readyState, CLOSED: WebSocket.CLOSED})
+        if(socketRef.current?.readyState === WebSocket.CLOSED){
             showErrorToast("E008"); //「サーバーとの接続が切断されました。」
             return;
         }
