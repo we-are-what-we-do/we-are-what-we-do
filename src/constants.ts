@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 
 // アプリケーションサーバーのドメイン
-// export const API_DOMAIN: string = "api.wawwd.net";
-export const API_DOMAIN: string = "testApi.wawwd.net";
+export const API_DOMAIN: string = "api.wawwd.net";
+// export const API_DOMAIN: string = "testApi.wawwd.net";
 
 // アプリケーションサーバーのURL
 export const API_URL: string = `https://${API_DOMAIN}/`;
