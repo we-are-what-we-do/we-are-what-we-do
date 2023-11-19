@@ -42,16 +42,16 @@ export default function ButtonArea(props: {
 
     // IPの状態を管理するcontext
     const {
-        // userFlag
+        userFlag
     } = useContext(UserContext);
-    const userFlag = true; // TODO テスト用プログラムの修正
+    // const userFlag = true; // TODO テスト用プログラムの修正
 
     // GPSの状態を管理するcontext
     const {
-        // gpsFlag,
+        gpsFlag,
         isLoadedGps
     } = useContext(GpsContext);
-    const gpsFlag = true; // TODO テスト用プログラムの修正
+    // const gpsFlag = true; // TODO テスト用プログラムの修正
 
     // リングのデータを追加するためのcontext
     const {
