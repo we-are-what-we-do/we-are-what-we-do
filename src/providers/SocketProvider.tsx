@@ -312,7 +312,8 @@ export function SocketProvider({children}: {children: ReactNode}){
 
         try{
             // base64形式の画像をサーバーに送信する
-            await postImageData(isTrialPage, imageData);
+            const response: Response = await postImageData(isTrialPage, imageData);
+            if(!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
 
             // 「ARリングの生成に成功しました。」というメッセージボックスを表示する
             showSuccessToast("I005");
