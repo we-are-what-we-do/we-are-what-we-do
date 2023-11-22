@@ -40,12 +40,13 @@ export async function getLocationConfig(isTrialPage: boolean = false): Promise<F
     const labelETag: string = isDevelopment ? "ETag-test" : "ETag";
 
     // 前回のETagをLocalStorageから取得
-    const previousETag = localStorage.getItem(labelETag) || null;
+    const previousETag: string | null = localStorage.getItem(labelETag);
     // console.log({previousETag});
 
     // ロケーションデータのGETリクエストを行う
     const url: string = (isTrialPage ? TEST_API_URL : API_URL) + "locations";
-    const headers: HeadersInit | undefined = previousETag ? { "If-None-Match": previousETag } : undefined;
+    const cashData: string | null = localStorage.getItem(labelLocations);
+    const headers: HeadersInit | undefined = (previousETag && cashData) ? { "If-None-Match": previousETag } : undefined;
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -67,7 +68,6 @@ export async function getLocationConfig(isTrialPage: boolean = false): Promise<F
             // console.log("キャッシュにgeolocationデータを保存しました");
         }else if(response.status === 304){
             // etagで、前回取得したデータと変わらない場合は、キャッシュに保存されたロケーションデータを返す
-            const cashData: string | null = localStorage.getItem(labelLocations);
             if(!cashData) throw new Error("etagを使ったのにキャッシュからgeolocationデータを読み込めませんでした");
             const locationData = JSON.parse(cashData) as FeatureCollection<Point>;
             result = locationData;
