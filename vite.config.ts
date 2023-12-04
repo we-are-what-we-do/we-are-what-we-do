@@ -25,7 +25,8 @@ export default defineConfig({
         live: resolve(root, "live", 'index.html'),
         gallery: resolve(root, "gallery", 'index.html'),
         trial: resolve(root, "trial", 'index.html'),
-        timelapse: resolve(root, "timelapse", 'index.html')
+        timelapse: resolve(root, "timelapse", 'index.html'),
+        exporter: resolve(root, "exporter", 'index.html')
       }
     }
   }

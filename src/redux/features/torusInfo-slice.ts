@@ -26,10 +26,21 @@ export const torusInfo = createSlice({
         initializeTorus : ((state, action) => {
             const newTorus: TorusInfo = action.payload;
             state.value = [newTorus];
-            console.log({newTorus, array: state.value})
+            // console.log({newTorus, array: state.value})
+        }),
+        overrideTori: ((state, action) => {
+            const newTori: TorusInfo[] = action.payload;
+            state.value = newTori;
+            // console.log({newTori, array: state.value})
         })
     }
 });
 
-export const { pushTorusInfo, resetHandle, replaceTorus, initializeTorus } = torusInfo.actions;
+export const {
+    pushTorusInfo,
+    resetHandle,
+    replaceTorus,
+    initializeTorus,
+    overrideTori
+} = torusInfo.actions;
 export default torusInfo.reducer;

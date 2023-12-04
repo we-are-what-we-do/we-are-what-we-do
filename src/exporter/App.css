@@ -1,0 +1,62 @@
+* {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+.canvas {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+.time-info {
+  position: absolute;
+  bottom: 4%;
+  left: 3%;
+  color: white;
+  font-size: 2.5rem;
+}
+
+.utilities {
+  overflow: visible;
+  position: absolute;
+  top: 4%;
+  left: 3%;
+  font-size: 2.5rem;
+  color: white;
+}
+
+/* レスポンシブ */
+@media screen and (max-width: 960px) {
+  .time-info {
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    color: white;
+    font-size: 2rem;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .time-info {
+    position: absolute;
+    bottom: 4%;
+    left: 3%;
+    color: white;
+    font-size: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .time-info {
+    position: absolute;
+    bottom: 4%;
+    left: 3%;
+    color: white;
+    font-size: 1.0rem;
+  }
+}
