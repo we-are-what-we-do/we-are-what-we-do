@@ -126,7 +126,7 @@ export function GpsProvider({children}: {children: ReactNode}){
         setCurrentPositions(position);
 
         // 現在地の取得とピンの位置を比較する
-        const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData)/*  ?? TEST_LOCATION_ID; */ // TODO テスト用ロケーションIDを使用しないよう修正
+        const locationId: string | null = compareCurrentLocationWithPin(position, geoJsonData)/*  ?? TEST_LOCATION_ID; */
 
         // 比較した結果をstateに保存する
         setLocation(locationId); // ロケーションIDを保存する
@@ -162,7 +162,7 @@ export function GpsProvider({children}: {children: ReactNode}){
 
             // ピンの範囲内かどうかをチェックしてメッセージとして表示する
             // showTestMessage({
-            //     isDo: isFirstDone/*  && false */, // TODO 本番環境ではチェック用メッセージは表示しない
+            //     isDo: isFirstDone/*  && false */,
             //     feature,
             //     distance,
             //     radius,

@@ -226,7 +226,6 @@ export function RingProvider({children}: {children: ReactNode}){
             nonce // 送信者ID
         };
 
-        // TODO テスト用のランダムユーザーIDをやめる
         // const newRandomUserId: string = uuidv4();
         // newRingData.user = newRandomUserId;
 

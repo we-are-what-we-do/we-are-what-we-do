@@ -194,8 +194,8 @@ export default function App() {
           )}
         </div>
       </div>
-      {/* <TestButtons testAddRing={testAddRing}/> */}{/* TODO テスト用ボタンは本番では表示しない */}
-      {/* <TestLocations/> */}{/* TODO テスト用ロケーション表示は本番では表示しない */}
+      {/* <TestButtons testAddRing={testAddRing}/> */}
+      {/* <TestLocations/> */}
       <ThemeProvider theme={theme}>
         <ButtonArea
           theme={theme}
