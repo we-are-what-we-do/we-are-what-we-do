@@ -21,6 +21,7 @@ import { DbContext } from "./providers/DbProvider";
 import { RingContext } from "./providers/RingProvider";
 import TestLocations from "./components/TestLocations";
 
+import { showWarnToast } from "./components/ToastHelpers"
 
 /* 定数定義 */
 export const ICON_SIZE: string = "5rem"; // ボタンの大きさ
@@ -50,6 +51,12 @@ const theme = createTheme({
 });
 
 export default function App() {
+  // TODO サービス再開時にはサービス停止中メッセージを削除すること
+  // 「現在、ARカメラアプリのサービスを停止しています」的なメッセージを表示する
+  useEffect(() => {
+    showWarnToast("I007");
+  }, []);
+
   /* stateやcontext等 */
   // サーバーから取得したリングデータを管理するcontext
   const {
