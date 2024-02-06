@@ -51,11 +51,10 @@ const theme = createTheme({
 });
 
 export default function App() {
-  // TODO サービス再開時にはサービス停止中メッセージを削除すること
   // 「現在、ARカメラアプリのサービスを停止しています」的なメッセージを表示する
-  useEffect(() => {
+/*   useEffect(() => {
     showWarnToast("I007");
-  }, []);
+  }, []); */
 
   /* stateやcontext等 */
   // サーバーから取得したリングデータを管理するcontext
